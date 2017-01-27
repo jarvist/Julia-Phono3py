@@ -1,0 +1,2 @@
+# Don't add massive HDF5 datafiles!
+*.hdf5
