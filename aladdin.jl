@@ -33,11 +33,6 @@ fid=h5open("kappa-2x2x2-m161616.hdf5","r")
 
 gamma_dset=fid["gamma"]
 gamma=read(gamma_dset)
-
-qpoint_dset=fid["qpoint"]
-qpoint=read(qpoint_dset)
-# OK, qpoint[:,N] pulls out a tuple of q-vector locations to match with the below gamma
-
 show(size(gamma))
 # (36,2052,1001)
 # So I think that's:
@@ -48,11 +43,41 @@ show(size(gamma))
 # So I guess that 1001 must be the temperature range. Don't know why things are reversed order.
 #display(gamma)
 
+qpoint_dset=fid["qpoint"]
+qpoint=read(qpoint_dset)
+# OK, qpoint[:,N] pulls out a tuple of q-vector locations to match with the below gamma
+
+ave_pp_dset=fid["ave_pp"]
+# Average phonon-phonon interaction, units eV^2
+ave_pp=read(ave_pp_dset)
+# 36×2052 Array{Float64,2}:
+# So that's:
+# * phonon
+# * q-point
+
 const Nphonons=36 #hard code, could alternatively read from the HDF5 file
 
+# Playing with looking over the 'gamma' and 'ave_pp' data
 for i in 1:Nphonons
     for q in 1:2052
-        @printf("Q-point: %d, k-space: [%f,%f,%f] \n",q,qpoint[1,q],qpoint[2,q],qpoint[3,q])
-        @printf("Gamma (Phonon: %d, qpoint: %d, T=1) = %f",i,q,gamma[i,q,1])
+        @printf("Q-point: %d, k-space: [%f,%f,%f] ",q,qpoint[1,q],qpoint[2,q],qpoint[3,q])
+        @printf("\t Gamma (Phonon: %d, qpoint: %d, T=1) = %f \n",i,q,gamma[i,q,1])
+        @printf("\tave_pp(Phonon: %d, qpoint: %d) = %g\n",i,q,ave_pp[i,q])
     end
 end
+
+# Playing with integrating across the BZ for the average phonon-phonon interaction strength
+for i in 1:Nphonons
+    sum=0
+    for q in 1:2052
+#        @printf("Q-point: %d, k-space: [%f,%f,%f] ",q,qpoint[1,q],qpoint[2,q],qpoint[3,q])
+        #@printf("\t Gamma (Phonon: %d, qpoint: %d, T=1) = %f \n",i,q,gamma[i,q,1])
+        
+#        @printf("\tave_pp(Phonon: %d, qpoint: %d) = %g\n",i,q,ave_pp[i,q])
+        sum+=ave_pp[i,q]
+    end
+    sum=sum/2052
+    @printf("\t Phonon: %d Average phonon-phonon interaction across BZ: %g\n",i,sum)
+end
+
+
