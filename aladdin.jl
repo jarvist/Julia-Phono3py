@@ -31,6 +31,11 @@ using HDF5
 # This file prepared by Jonathan, is ~4.5G and resident on Cobalt: /share/Jarv-MAPbI3-Kappa/kappa-2x2x2-m161616.hdf5
 fid=h5open("kappa-2x2x2-m161616.hdf5","r")
 
+# > ls CsPbI3/
+# fc2.hdf5            fc3.hdf5            kappa-m111111.hdf5  pulldown_data.sh
+# Simplified cubic CsPbI3; on Titanium
+#fid=h5open("./CsPbI3/kappa-m111111.hdf5","r")
+
 gamma_dset=fid["gamma"]
 gamma=read(gamma_dset)
 show(size(gamma))
