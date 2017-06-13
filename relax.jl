@@ -17,13 +17,17 @@ using HDF5
 
 
 for file in ["kappa-2x2x2-m161616.hdf5","CsPbI3-m111111.hdf5"]
-    @printf("Opening file: %s\n",file)
+    @printf("Opening file: %s\t",file)
     fid=h5open("$file","r")
+
+freq_dset=fid["frequency"]
+freq=read(freq_dset)
 
 gamma_dset=fid["gamma"]
 gam=read(gamma_dset)
 show(size(gam))
 # (36,2052,1001)
+println()
 # So I think that's:
 # * Phonon mode (of 36)
 # * K-point (16x16x16 mesh -> 4096; ~ divided by two due to k=-k, plus gamma point)
@@ -51,7 +55,8 @@ for q in 1:1 #2052 # which BZ points
     for T in 1:1 #:10:100 # by data point, so T=1 = 0K
             @printf("Q-point: %d, k-space: [%f,%f,%f]. T=%d\n",q,qpoint[1,q],qpoint[2,q],qpoint[3,q],T)
         for i in 1:Nphonons
-            @printf("\t Mode: %d Gamma(T=%d)= %f (raw) = %f ps\n",i,T,gam[i,q,T],1/(2*2pi*gam[i,q,T]))
+            @printf("\t Mode: %d = %.1f THz Gamma(T=%d)= %f (raw) = %f ps\n",
+                i,freq[i,q],T,gam[i,q,T],1/(2*2pi*gam[i,q,T]))
 #            @printf("\tave_pp(Phonon: %d, qpoint: %d) = %g\n",i,q,ave_pp[i,q])
         end
         @printf("\n")
