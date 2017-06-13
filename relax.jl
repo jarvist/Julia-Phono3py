@@ -21,8 +21,8 @@ for file in ["kappa-2x2x2-m161616.hdf5","CsPbI3-m111111.hdf5"]
     fid=h5open("$file","r")
 
 gamma_dset=fid["gamma"]
-gamma=read(gamma_dset)
-show(size(gamma))
+gam=read(gamma_dset)
+show(size(gam))
 # (36,2052,1001)
 # So I think that's:
 # * Phonon mode (of 36)
@@ -44,14 +44,14 @@ qpoint=read(qpoint_dset)
 # * phonon
 # * q-point
 
-const Nphonons=15 #hard code, could alternatively read from the HDF5 file
+const Nphonons=size(gam)[1] #hard code, could alternatively read from the HDF5 file
 
 # Playing with looking over the 'gamma' and 'ave_pp' data
 for q in 1:1 #2052 # which BZ points
     for T in 1:1 #:10:100 # by data point, so T=1 = 0K
             @printf("Q-point: %d, k-space: [%f,%f,%f]. T=%d\n",q,qpoint[1,q],qpoint[2,q],qpoint[3,q],T)
         for i in 1:Nphonons
-            @printf("\t Mode: %d Gamma(T=%d)= %f (raw) = %f ps\n",i,T,gamma[i,q,T],1/(2*2pi*gamma[i,q,T]))
+            @printf("\t Mode: %d Gamma(T=%d)= %f (raw) = %f ps\n",i,T,gam[i,q,T],1/(2*2pi*gam[i,q,T]))
 #            @printf("\tave_pp(Phonon: %d, qpoint: %d) = %g\n",i,q,ave_pp[i,q])
         end
         @printf("\n")
